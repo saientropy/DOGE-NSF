@@ -1,90 +1,125 @@
-# NSF Awards Downloader
+# NSF Research Awards Analysis Suite
 
-A Tkinter-based GUI application to download National Science Foundation (NSF) award data. Select specific years and download data in CSV and JSON formats, organized into year-specific folders.
+A comprehensive toolkit for downloading and analyzing National Science Foundation (NSF) research awards data. This suite includes two main tools:
+1. NSF Awards Downloader - Download award data by year
+2. Red Flag Analyzer - Analyze award abstracts for specific keywords and patterns
 
 ## Features
 
-- **GUI Year Selection**: Simple interface with checkboxes for years 2010-present
-- **Organized Output**: Data saved in year-specific folders (`awards_<year>/`)
-- **Multiple Formats**: Creates both CSV and JSON files for each year
-- **Automatic Pagination**: Fetches data in chunks of 25 records
-- **Progress Tracking**: Real-time progress and debug information display
-- **Data Validation**: Warns if no records are found for selected years
+### NSF Awards Downloader
+- **Year Selection**: GUI interface for selecting years (2010-present)
+- **Automated Data Retrieval**: Handles pagination and API requests automatically
+- **Multi-format Export**: Saves data in both CSV and JSON formats
+- **Progress Tracking**: Real-time download status and debugging information
+- **Organized Storage**: Creates year-specific folders for downloaded data
 
-## Requirements
-
-- Python 3.7+ (3.6 compatible but not recommended)
-- Tkinter (included with most Python installations)
-  - Debian/Ubuntu: `sudo apt-get install python3-tk`
-  - Fedora: `sudo dnf install python3-tkinter`
-- Requests library: `pip install requests`
+### Red Flag Analyzer
+- **Keyword Analysis**: Search through award abstracts using predefined or custom keywords
+- **Financial Insights**: Calculate total funding for filtered results
+- **Interactive UI**: Quick-add buttons for common red flag terms
+- **Detailed Views**: Double-click to view full abstract text
+- **CSV Import**: Compatible with NSF Awards Downloader output
 
 ## Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/nsf-awards-downloader.git
-   cd nsf-awards-downloader
+   git clone https://github.com/your-username/nsf-awards-analysis.git
+   cd nsf-awards-analysis
    ```
 
-2. Install dependencies:
+2. Install required dependencies:
    ```bash
-   pip install requests
+   pip install requests pandas tkinter
+   ```
+
+3. For Linux users, install Tkinter if not included:
+   ```bash
+   # Debian/Ubuntu
+   sudo apt-get install python3-tk
+
+   # Fedora
+   sudo dnf install python3-tkinter
    ```
 
 ## Usage
 
-1. Run the script:
+### NSF Awards Downloader
+1. Run the downloader:
    ```bash
-   python nsf_awards_downloader.py
+   python nsf_data_extractor.py
    ```
+2. Select desired years using checkboxes
+3. Click "Download" to begin
+4. Monitor progress in the status window
+5. Find downloaded data in `awards_<year>/` folders
 
-2. Select desired years using the checkboxes
-3. Click "Download" to begin data retrieval
-4. Monitor progress in the on-screen log
-5. Find output files in `awards_<year>/` folders
+### Red Flag Analyzer
+1. Run the analyzer:
+   ```bash
+   python redflag-detector.py
+   ```
+2. Click "Upload CSV" to load award data
+3. Use predefined red flag buttons or enter custom keywords
+4. View filtered results and funding totals
+5. Double-click any entry to view full abstract
 
-## Data Fields
+## Data Structure
 
-The following fields are extracted for each award:
+### Downloaded Award Fields
+- Award ID
+- Agency
+- Awardee Name
+- Project Title
+- Abstract Text
+- Obligated Funds
+- Estimated Total Amount
+- PI/PD Name
+- Co-PIs
+- Program Officer
+- Start/End Dates
+- Primary Program
 
-| Field | Description |
-|-------|-------------|
-| `id` | Unique award identifier |
-| `agency` | Awarding agency (typically "NSF") |
-| `awardeeName` | Recipient institution/entity |
-| `title` | Project title |
-| `abstractText` | Project description |
-| `fundsObligatedAmt` | Current obligated funds |
-| `estimatedTotalAmt` | Estimated total award amount |
-| `pdPIName` | Project Director/Principal Investigator |
-| `coPDPI` | Co-Principal Investigators |
-| `poName` | NSF Program Officer |
-| `startDate` | Award start date |
-| `expDate` | Award expiration date |
-| `primaryProgram` | Primary NSF funding program |
-
-## File Structure
-Each year's data is saved in a separate folder with the following structure:
+### File Organization
+```
 awards_2023/
-├── 2023_awards.csv      # CSV file containing all awards for 2023
-└── 2023_awards.json     # JSON file containing same data in JSON format
+├── 2023_awards.csv
+└── 2023_awards.json
 
-awards_2022/ 
-├── 2022_awards.csv      # CSV file containing all awards for 2022  
-└── 2022_awards.json     # JSON file containing same data in JSON format
+awards_2022/
+├── 2022_awards.csv
+└── 2022_awards.json
+```
 
-etc...
+## Predefined Red Flag Terms
+The analyzer includes common terms often found in grant proposals, including:
+- Innovation-related: "innovative", "cutting-edge", "revolutionary"
+- Impact-related: "transformative", "game-changing", "scalable"
+- DEI-related: "diversity", "equity", "inclusion"
+- Methodology: "framework", "empirical", "methodology"
 
 ## Limitations
 
-- No specified API rate limits, but large downloads may require additional delay
-- Fixed pagination of 25 records per request (NSF API maximum)
-- Full-year searches only (Jan 1 - Dec 31)
-- Empty files created for years with no awards
-- Uses only public NSF data
-- Tested primarily on Python 3.7+ (Windows)
+### NSF Awards Downloader
+- Fixed 25 records per API request (NSF limitation)
+- Full-year downloads only (Jan 1 - Dec 31)
+- No specified API rate limits
+
+### Red Flag Analyzer
+- CSV format must match NSF Awards Downloader output
+- Text search is case-insensitive but exact match only
+- Memory usage increases with larger datasets
+
+## Requirements
+- Python 3.7+
+- Tkinter (GUI library)
+- Pandas (data processing)
+- Requests (API calls)
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
