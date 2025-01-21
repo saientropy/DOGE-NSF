@@ -1,65 +1,98 @@
-import customtkinter as ctk
+import customtkinter as ctk  # pip install customtkinter
 import pandas as pd
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, ttk, messagebox
 from tkinter.scrolledtext import ScrolledText
-from fpdf import FPDF
+from fpdf import FPDF  # pip install fpdf
 
-# --------------------- Configure Appearance & Theme --------------------- #
+# --------------------- CONFIGURE APPEARANCE & THEME --------------------- #
 ctk.set_appearance_mode("System")   # "System", "Dark", or "Light"
 ctk.set_default_color_theme("blue") # "blue", "green", "dark-blue"
 
-# --------------------- Tiered Red-Flag Words --------------------- #
-RED_FLAG_TIERS = {
-    "Tier 1 (Most Woke)": [
-        "Systemic Racism", "White Privilege", "Anti-Racism",
-        "Implicit Bias", "Microaggressions", "BIPOC", "LGBTQ+",
-        "Gender Non-Conforming", "Trigger Warning", "Safe Space",
-        "Cultural Appropriation", "Radical Inclusion", "Allyship",
-        "Anti-Oppression", "Equity Lens", "Restorative Justice",
-        "Decolonization", "Cultural Humility"
-    ],
-    "Tier 2": [
-        "Intersectionality", "Social Justice", "Marginalized Communities",
-        "Socioeconomic Disadvantage", "Racial Justice", "Community Engagement",
-        "Diversity Training"
-    ],
-    "Tier 3": [
-        "Diversity", "Equity", "Inclusion", "Holistic Approach",
-        "Representation", "Accessibility", "Neurodiversity",
-        "Gender Equity", "Affirmative Action"
-    ],
-    "Tier 4 (Least Woke)": [
-        "Innovative", "Cutting-edge", "Synergy", "Leverage",
-        "Revolutionary", "Disruptive", "AI-driven",
-        "Blockchain", "Cryptocurrency", "Paradigm"
-    ]
-}
+# --------------------- RED-FLAG WORDS LIST --------------------- #
+RED_FLAG_WORDS = [
+    # --- Original sample set ---
+    "innovative", "cutting-edge", "synergy", "leverage", "game-changing",
+    "revolutionary", "disruptive", "paradigm", "unprecedented", "scalable",
+    "diversity", "equity", "inclusion", "women", "underrepresented",
+    "gender", "race", "social justice", "holistic", "empowerment",
+    "framework", "sustainability", "impactful", "stakeholder", "inclusive",
+    "transformation", "intersectionality", "accessible", "empirical",
+    "methodology", "outreach", "collaboration", "potential", "scalability",
+    "climate change", "AI-driven", "blockchain", "metaverse", "cryptocurrency",
+    
+    # --- Newly added DEI/social-justice terms ---
+    "Equity",
+    "Inclusion",
+    "Diversity",
+    "Intersectionality",
+    "Social Justice",
+    "Systemic Racism",
+    "Anti-Racism",
+    "Cultural Competency",
+    "Microaggressions",
+    "Implicit Bias",
+    "White Privilege",
+    "BIPOC",
+    "LGBTQIA+",
+    "Gender Non-Conforming",
+    "Allyship",
+    "Decolonization",
+    "Restorative Justice",
+    "Safe Space",
+    "Trigger Warning",
+    "Cultural Appropriation",
+    "Marginalized Communities",
+    "Underserved Populations",
+    "Disparity",
+    "Representation",
+    "Accessibility",
+    "Neurodiversity",
+    "Empowerment",
+    "Affirmative Action",
+    "Equitable Access",
+    "Inclusive Practices",
+    "Cultural Humility",
+    "Anti-Oppression",
+    "Equity Lens",
+    "Radical Inclusion",
+    "Community Engagement",
+    "Diversity Training",
+    "Socioeconomic Disadvantage",
+    "Gender Equity",
+    "Racial Justice",
+    "Holistic Approach"
+]
 
-# Merged list of ALL words (for internal searching if needed)
-ALL_WORDS = []
-for tier in RED_FLAG_TIERS.values():
-    ALL_WORDS.extend(tier)
+# Global variable to store the DataFrame
+data = None
 
-# Global variables
-data = None        # Will hold the main DataFrame
-rows_frame = None  # The frame to hold the scrollable list of rows
-
-# --------------------- Functions --------------------- #
+# --------------------- FUNCTIONS --------------------- #
+def filter_by_keywords(df, keywords):
+    """Filter abstracts containing any of the specified keywords (case-insensitive)."""
+    if not keywords:
+        # If no keywords provided, just return original DataFrame and sum
+        return df, df["estimatedTotalAmt"].sum()
+    
+    pattern = "|".join(keywords)
+    filtered = df[df["abstractText"].str.contains(pattern, case=False, na=False)]
+    total_funding = filtered["estimatedTotalAmt"].sum()
+    return filtered, total_funding
 
 def analyze_file(filepath):
-    """Read CSV into a DataFrame with expected columns."""
+    """Read CSV into a DataFrame, ensuring types are correct."""
     try:
         df = pd.read_csv(filepath)
+        # Ensure columns exist; fill missing abstract text with empty strings
         df["abstractText"] = df.get("abstractText", "").fillna("").astype(str)
+        # Convert funding column to float; fill missing with 0
         df["estimatedTotalAmt"] = df.get("estimatedTotalAmt", 0).fillna(0).astype(float)
         return df
     except Exception as e:
-        messagebox.showerror("Error", f"Failed to process file:\n{e}")
+        messagebox.showerror("Error", f"Failed to process the file: {e}")
         return None
 
 def upload_file():
-    """Prompt user to select a CSV file, load and display initial data."""
-    global data
+    """Handle file upload and display initial data if successful."""
     filepath = filedialog.askopenfilename(
         filetypes=[("CSV Files", "*.csv")],
         title="Select a CSV File"
@@ -67,44 +100,31 @@ def upload_file():
     if not filepath:
         return
     
-    df = analyze_file(filepath)
-    if df is not None:
-        data = df
-        update_display()  # Refresh view with current (possibly empty) keywords
-
-def filter_by_keywords(df, keywords):
-    """
-    Return a tuple (filtered_dataframe, sum_of_funding)
-    by searching 'abstractText' for any of the given keywords (case-insensitive).
-    """
-    if not keywords:
-        # If no keywords, return entire dataset
-        return df, df["estimatedTotalAmt"].sum()
-
-    pattern = "|".join(keywords)
-    filtered = df[df["abstractText"].str.contains(pattern, case=False, na=False)]
-    total_funding = filtered["estimatedTotalAmt"].sum()
-    return filtered, total_funding
+    global data
+    data = analyze_file(filepath)
+    if data is not None:
+        # After loading new data, display everything or apply current filters
+        display_data(data)
+        update_display()  # Refresh display to apply any existing keywords
 
 def update_display():
-    """Filter data by user-entered keywords and display results in the scrollable list."""
+    """Update the data table based on entered keywords."""
     if data is None:
         return
     
-    # Gather keywords from entry
+    # Gather keywords from the entry
     keywords = keyword_entry.get().split(",")
     keywords = [k.strip() for k in keywords if k.strip()]
-
-    filtered_df, total_funding = filter_by_keywords(data, keywords)
-    total_label.configure(text=f"Total Funding: ${total_funding:,.2f}")
     
-    display_data_in_list(filtered_df)
+    filtered, total_funding = filter_by_keywords(data, keywords)
+    display_data(filtered)
+    total_label.configure(text=f"Total Funding: ${total_funding:,.2f}")
 
 def add_keyword(word):
-    """Append a single red-flag word to the keyword entry and refresh display."""
-    current = keyword_entry.get().strip()
-    if current:
-        updated = f"{current}, {word}"
+    """Add a red-flag word to the keyword entry and refresh display."""
+    current_keywords = keyword_entry.get().strip()
+    if current_keywords:
+        updated = f"{current_keywords}, {word}"
     else:
         updated = word
     
@@ -112,208 +132,183 @@ def add_keyword(word):
     keyword_entry.insert(0, updated)
     update_display()
 
-def display_data_in_list(filtered_df):
-    """
-    Display each row of 'filtered_df' as a clickable item in a scrollable frame.
-    Each item includes minimal info + a 'View Abstract' button.
-    """
-    # Clear previous items in rows_frame
-    for child in rows_frame.winfo_children():
-        child.destroy()
+def display_data(filtered_df):
+    """Populate the Treeview with the filtered DataFrame."""
+    # Clear existing rows
+    for row in tree.get_children():
+        tree.delete(row)
+    
+    # Insert new rows
+    for _, row_data in filtered_df.iterrows():
+        # Use str(...) for safety in case columns are missing
+        tree.insert(
+            "",
+            "end",
+            values=(
+                str(row_data.get("id", "")),
+                str(row_data.get("awardeeName", "")),
+                str(row_data.get("title", "")),
+                str(row_data.get("abstractText", "")),
+                f"{row_data.get('estimatedTotalAmt', 0):,.2f}"
+            )
+        )
 
-    if filtered_df.empty:
-        # Optional: display a 'no data' message
-        no_data_label = ctk.CTkLabel(rows_frame, text="No results found.")
-        no_data_label.pack(pady=10)
+def show_full_abstract(event):
+    """Open a new window to display the full abstract text on double-click."""
+    selected_item = tree.selection()
+    if not selected_item:
         return
-
-    # Create a frame/item for each row
-    for idx, row_data in filtered_df.iterrows():
-        item_frame = ctk.CTkFrame(rows_frame)
-        item_frame.pack(fill="x", pady=5, padx=5)
-
-        # Show minimal info: Title, Awardee, Funding
-        title_label = ctk.CTkLabel(
-            item_frame, 
-            text=f"Title: {row_data.get('title', '')}", 
-            font=("Arial", 14, "bold")
-        )
-        title_label.pack(anchor="w", padx=5)
-
-        awardee_label = ctk.CTkLabel(
-            item_frame, 
-            text=f"Awardee: {row_data.get('awardeeName', '')}", 
-            font=("Arial", 12)
-        )
-        awardee_label.pack(anchor="w", padx=5)
-
-        funding_label = ctk.CTkLabel(
-            item_frame, 
-            text=f"Funding: ${row_data.get('estimatedTotalAmt', 0):,.2f}", 
-            font=("Arial", 12, "italic")
-        )
-        funding_label.pack(anchor="w", padx=5)
-
-        # View Abstract button
-        abstract_text = row_data.get("abstractText", "")
-        view_btn = ctk.CTkButton(
-            item_frame, 
-            text="View Abstract", 
-            command=lambda txt=abstract_text: show_full_abstract(txt)
-        )
-        view_btn.pack(anchor="e", padx=5, pady=(5, 0))
-
-        # Optional separator
-        separator = ctk.CTkLabel(item_frame, text="-" * 80)
-        separator.pack(fill="x", pady=5)
-
-def show_full_abstract(abstract):
-    """
-    Opens a new window with a scrollable text widget containing the full abstract.
-    """
+    abstract = tree.item(selected_item)["values"][3]
+    
     abstract_window = ctk.CTkToplevel(root)
     abstract_window.title("Full Abstract")
     abstract_window.geometry("800x600")
-
+    
     scrolled_text = ScrolledText(abstract_window, wrap="word", font=("Arial", 12))
     scrolled_text.pack(expand=True, fill="both")
-    scrolled_text.insert("end", abstract)
+    scrolled_text.insert(ctk.END, abstract)
     scrolled_text.config(state="disabled")
 
 def generate_report():
     """
-    Generate a PDF report of the top 10 most-funded items from the current filter.
+    Generate a PDF report of the top 10 most-funded abstracts 
+    based on the currently filtered data.
     """
     if data is None:
         messagebox.showinfo("No Data", "Please upload and filter data first.")
         return
-
-    # Get current keywords
+    
+    # Gather current filter keywords
     keywords = keyword_entry.get().split(",")
     keywords = [k.strip() for k in keywords if k.strip()]
-    filtered_df, _ = filter_by_keywords(data, keywords)
-
-    if filtered_df.empty:
+    filtered, _ = filter_by_keywords(data, keywords)
+    
+    if filtered.empty:
         messagebox.showinfo("No Data", "No records match the current filter.")
         return
+    
+    # Sort by 'estimatedTotalAmt' descending and get top 10
+    top_10 = filtered.nlargest(10, "estimatedTotalAmt")
 
-    # Sort by funding descending, take top 10
-    top_10 = filtered_df.nlargest(10, "estimatedTotalAmt")
-
-    # Prompt user to save PDF
+    # Prompt user to save the PDF
     save_path = filedialog.asksaveasfilename(
         defaultextension=".pdf",
         filetypes=[("PDF file", "*.pdf")],
         title="Save Report as PDF"
     )
     if not save_path:
-        return  # user canceled
-
-    # Create PDF with FPDF
+        return  # User canceled saving
+    
+    # --------------------- Generate PDF with FPDF --------------------- #
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
     
+    # Title
     pdf.cell(0, 10, "Top 10 Most-Funded Projects Report", ln=True, align="C")
-    pdf.ln(5)
-
+    pdf.ln(10)  # extra space
+    
     # Table headers
     pdf.set_font("Arial", "B", 12)
     pdf.cell(20, 10, "Rank", border=1)
     pdf.cell(50, 10, "Awardee", border=1)
     pdf.cell(40, 10, "Funding", border=1)
     pdf.cell(80, 10, "Title", border=1, ln=True)
-
+    
     # Table rows
     pdf.set_font("Arial", "", 12)
     rank = 1
     for _, row_data in top_10.iterrows():
-        pdf.cell(20, 10, str(rank), border=1)
-        awardee = str(row_data.get("awardeeName", "")[:20])
-        pdf.cell(50, 10, awardee, border=1)
+        awardee = str(row_data.get("awardeeName", "")[:20])  # truncated
+        title = str(row_data.get("title", "")[:30])          # truncated
         funding_str = f"${row_data.get('estimatedTotalAmt', 0):,.2f}"
+        
+        pdf.cell(20, 10, str(rank), border=1)
+        pdf.cell(50, 10, awardee, border=1)
         pdf.cell(40, 10, funding_str, border=1)
-        title_str = str(row_data.get("title", "")[:30])
-        pdf.cell(80, 10, title_str, border=1, ln=True)
+        pdf.cell(80, 10, title, border=1, ln=True)
         rank += 1
-
-    # Second page for full abstracts
+    
+    # Add second page for full abstracts
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
     pdf.cell(0, 10, "Full Abstracts", ln=True, align="C")
-    pdf.ln(5)
-
+    pdf.ln(10)
+    
     pdf.set_font("Arial", "", 12)
     rank = 1
     for _, row_data in top_10.iterrows():
-        pdf.multi_cell(0, 10, f"{rank}. {row_data.get('title', '')}")
+        pdf.multi_cell(0, 10, f"#{rank} - {row_data.get('title', '')}")
         pdf.multi_cell(0, 10, f"Awardee: {row_data.get('awardeeName', '')}")
         pdf.multi_cell(0, 10, f"Funding: ${row_data.get('estimatedTotalAmt', 0):,.2f}")
         pdf.multi_cell(0, 10, f"Abstract:\n{row_data.get('abstractText', '')}")
-        pdf.ln(5)
+        pdf.ln(5)  # space between entries
         rank += 1
     
+    # Save PDF
     pdf.output(save_path)
-    messagebox.showinfo("Report Generated", f"Report saved:\n{save_path}")
+    messagebox.showinfo("Success", f"Report generated and saved:\n{save_path}")
 
-# --------------------- Create the Main UI --------------------- #
+# --------------------- CREATE THE MAIN UI --------------------- #
 root = ctk.CTk()
-root.title("NSF Grant Scam Detector (Beta)")
-root.geometry("1200x800")
+root.title("Project Red Flag Analyzer (Modern UI)")
+root.geometry("1400x900")
 
-# Top frame: Upload & Keywords
+# ----- Top Frame: Upload & Keywords ----- #
 frame_top = ctk.CTkFrame(root)
 frame_top.pack(pady=10, fill="x", padx=10)
 
 upload_button = ctk.CTkButton(frame_top, text="Upload CSV", command=upload_file, width=120)
 upload_button.pack(side="left", padx=10)
 
-keyword_label = ctk.CTkLabel(frame_top, text="Keywords (comma-separated):")
-keyword_label.pack(side="left", padx=5)
+keyword_label = ctk.CTkLabel(frame_top, text="Enter Keywords (comma-separated):")
+keyword_label.pack(side="left", padx=10)
 
-keyword_entry = ctk.CTkEntry(frame_top, width=300, placeholder_text="e.g. synergy, disruptive")
-keyword_entry.pack(side="left", padx=5)
+keyword_entry = ctk.CTkEntry(frame_top, width=400, placeholder_text="e.g. synergy, disruptive")
+keyword_entry.pack(side="left", padx=10)
 
-apply_button = ctk.CTkButton(frame_top, text="Apply Filters", command=update_display, width=120)
-apply_button.pack(side="left", padx=10)
+keyword_button = ctk.CTkButton(frame_top, text="Apply Filters", command=update_display, width=120)
+keyword_button.pack(side="left", padx=10)
 
-# Show total funding
+# ----- Funding Total Label ----- #
 total_label = ctk.CTkLabel(root, text="Total Funding: $0.00", font=("Arial", 14))
 total_label.pack(pady=10)
 
-# Red-Flag Word Buttons by Tier
-tiers_frame = ctk.CTkFrame(root)
-tiers_frame.pack(pady=10, fill="x", padx=10)
+# ----- Red-Flag Words Buttons ----- #
+frame_buttons = ctk.CTkFrame(root)
+frame_buttons.pack(pady=10, fill="x", padx=10)
 
-for tier_name, words_list in RED_FLAG_TIERS.items():
-    tier_label = ctk.CTkLabel(tiers_frame, text=tier_name + ":", font=("Arial", 13, "bold"))
-    tier_label.pack(anchor="w", pady=(10,5))
+red_flag_label = ctk.CTkLabel(frame_buttons, text="Quick-Add Red-Flag Words:")
+red_flag_label.pack(anchor="w", pady=(0, 5))
 
-    # Container for that tier's buttons
-    tier_btn_container = ctk.CTkFrame(tiers_frame)
-    tier_btn_container.pack(anchor="w", padx=10)
-    
-    # Decide how many columns you want for each tier
-    col_count = 4
-    for idx, w in enumerate(words_list):
-        btn = ctk.CTkButton(
-            tier_btn_container, 
-            text=w, 
-            command=lambda word=w: add_keyword(word), 
-            width=150
-        )
-        r = idx // col_count
-        c = idx % col_count
-        btn.grid(row=r, column=c, padx=5, pady=5)
+button_container = ctk.CTkFrame(frame_buttons)
+button_container.pack(pady=5, fill="x")
 
-# Scrollable frame for data rows
-scroll_frame = ctk.CTkScrollableFrame(root, width=1100, height=400)
-scroll_frame.pack(padx=10, pady=10, fill="both", expand=True)
+# Display red-flag words in a grid (5 columns)
+cols = 5
+for idx, word in enumerate(RED_FLAG_WORDS):
+    btn = ctk.CTkButton(button_container, text=word, command=lambda w=word: add_keyword(w), width=120)
+    row = idx // cols
+    col = idx % cols
+    btn.grid(row=row, column=col, padx=5, pady=5)
 
-rows_frame = scroll_frame  # We'll place each row directly in scroll_frame
+# ----- Table for Results ----- #
+tree_columns = ("ID", "Awardee Name", "Title", "Abstract", "Funding Amount")
+tree = ttk.Treeview(root, columns=tree_columns, show="headings", height=20)
 
-# Report button
-report_button = ctk.CTkButton(root, text="Generate Report", command=generate_report, width=180)
+for col in tree_columns:
+    tree.heading(col, text=col)
+    if col == "Abstract":
+        tree.column(col, width=500)
+    else:
+        tree.column(col, width=150)
+
+tree.pack(pady=10, fill="both", expand=True)
+tree.bind("<Double-1>", show_full_abstract)
+
+# ----- Generate Report Button ----- #
+report_button = ctk.CTkButton(root, text="Generate Report", command=generate_report, width=200)
 report_button.pack(pady=10)
 
+# ----- Start the GUI Main Loop ----- #
 root.mainloop()

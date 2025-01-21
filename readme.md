@@ -17,7 +17,7 @@ A comprehensive toolkit for downloading and analyzing National Science Foundatio
 - **Keyword Analysis**: Search through award abstracts using predefined or custom keywords
 - **Financial Insights**: Calculate total funding for filtered results
 - **Interactive UI**: Quick-add buttons for common red flag terms
-- **Detailed Views**: Double-click to view full abstract text
+- **Detailed Views**: Double-click to view full abstract text with highlighted red flag words
 - **CSV Import**: Compatible with NSF Awards Downloader output
 
 ## Installation
@@ -30,7 +30,7 @@ A comprehensive toolkit for downloading and analyzing National Science Foundatio
 
 2. Install required dependencies:
    ```bash
-   pip install requests pandas tkinter
+   pip install requests pandas customtkinter fpdf
    ```
 
 3. For Linux users, install Tkinter if not included:
@@ -62,7 +62,7 @@ A comprehensive toolkit for downloading and analyzing National Science Foundatio
 2. Click "Upload CSV" to load award data
 3. Use predefined red flag buttons or enter custom keywords
 4. View filtered results and funding totals
-5. Double-click any entry to view full abstract
+5. Double-click any entry to view full abstract with highlighted red flag words
 
 ## Data Structure
 
@@ -83,12 +83,10 @@ A comprehensive toolkit for downloading and analyzing National Science Foundatio
 ### File Organization
 ```
 awards_2023/
-├── 2023_awards.csv
-└── 2023_awards.json
+├── 2023_awards.json
 
 awards_2022/
-├── 2022_awards.csv
-└── 2022_awards.json
+├── 2022_awards.json
 ```
 
 ## Predefined Red Flag Terms
@@ -106,7 +104,7 @@ The analyzer includes common terms often found in grant proposals, including:
 - No specified API rate limits
 
 ### Red Flag Analyzer
-- CSV format must match NSF Awards Downloader output
+- JSON format must match NSF Awards Downloader output
 - Text search is case-insensitive but exact match only
 - Memory usage increases with larger datasets
 
