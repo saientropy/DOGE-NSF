@@ -1,5 +1,11 @@
 # NSF Research Awards Analysis Suite to detect abstract fraud.
 
+Abstract fraud is often decided based on the observation that some researchers fill their abstracts with "word salad"—a jumble of buzzwords and jargon that sounds impressive but ultimately means nothing. This tactic is used to impress reviewers and secure funding for research that is often incremental and has little to no real impact.
+
+The goal of this analysis suite is to uncover how science funding is allocated to projects that may not contribute significantly to the advancement of knowledge or societal benefit. By analyzing award abstracts for specific keywords and patterns, we aim to identify instances where funding may be going to research that lacks substance or genuine innovation.
+
+This is just the beginning of the process to shed light on the allocation of science funding and to challenge the status quo of how research proposals are evaluated.
+
 A comprehensive toolkit for downloading and analyzing National Science Foundation (NSF) research awards data. This suite includes two main tools:
 1. NSF Awards Downloader - Download award data by year
 2. Red Flag Analyzer - Analyze award abstracts for specific keywords and patterns
@@ -24,7 +30,7 @@ A comprehensive toolkit for downloading and analyzing National Science Foundatio
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/nsf-awards-analysis.git
+   git clone https://github.com/saientropy/nsf-awards-analysis.git
    cd nsf-awards-analysis
    ```
 
