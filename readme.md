@@ -1,4 +1,4 @@
-# NSF Research Awards Analysis Suite
+# NSF Research Awards Analysis Suite to detect abstract fraud.
 
 A comprehensive toolkit for downloading and analyzing National Science Foundation (NSF) research awards data. This suite includes two main tools:
 1. NSF Awards Downloader - Download award data by year
