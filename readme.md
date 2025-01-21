@@ -6,6 +6,8 @@ The goal of this analysis suite is to uncover how science funding is allocated t
 
 This is just the beginning of the process to shed light on the allocation of science funding and to challenge the status quo of how research proposals are evaluated.
 
+**While some awards may emerge during the analysis as genuinely deserving of public funds, they are certainly not the majority. The goal of this process is not merely to separate the wheat from the chaff but to critically evaluate whether public funding of science is necessary in the first place.**
+
 A comprehensive toolkit for downloading and analyzing National Science Foundation (NSF) research awards data. This suite includes three main tools:
 1. NSF Awards Downloader - Download award data by year
 2. Red Flag Analyzer - Analyze award abstracts for specific keywords and patterns
