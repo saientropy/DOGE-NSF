@@ -44,25 +44,16 @@ A comprehensive toolkit for downloading and analyzing National Science Foundatio
 
 ## Usage
 
-### NSF Awards Downloader
-1. Run the downloader:
+1. Run the application:
    ```bash
-   python nsf_data_extractor.py
+   python nsf.py
    ```
-2. Select desired years using checkboxes
-3. Click "Download" to begin
-4. Monitor progress in the status window
-5. Find downloaded data in `awards_<year>/` folders
 
-### Red Flag Analyzer
-1. Run the analyzer:
-   ```bash
-   python redflag-detector.py
-   ```
-2. Click "Upload CSV" to load award data
-3. Use predefined red flag buttons or enter custom keywords
-4. View filtered results and funding totals
-5. Double-click any entry to view full abstract with highlighted red flag words
+2. Select the desired year using the GUI.
+3. Choose any red flag keywords you want to analyze.
+4. Click the "Analyze" button to fetch and analyze the data.
+5. Review the results displayed in the GUI, with red flag words highlighted in the abstracts.
+6. Generate a report by clicking the "Generate Report" button after analysis.
 
 ## Data Structure
 
