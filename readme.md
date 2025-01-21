@@ -6,9 +6,10 @@ The goal of this analysis suite is to uncover how science funding is allocated t
 
 This is just the beginning of the process to shed light on the allocation of science funding and to challenge the status quo of how research proposals are evaluated.
 
-A comprehensive toolkit for downloading and analyzing National Science Foundation (NSF) research awards data. This suite includes two main tools:
+A comprehensive toolkit for downloading and analyzing National Science Foundation (NSF) research awards data. This suite includes three main tools:
 1. NSF Awards Downloader - Download award data by year
 2. Red Flag Analyzer - Analyze award abstracts for specific keywords and patterns
+3. NSF Awards Analysis Suite - Download award data and analyze abstracts for keywords in one integrated tool
 
 ## Features
 
@@ -26,11 +27,17 @@ A comprehensive toolkit for downloading and analyzing National Science Foundatio
 - **Detailed Views**: Double-click to view full abstract text with highlighted red flag words
 - **CSV Import**: Compatible with NSF Awards Downloader output
 
+### NSF Awards Analysis Suite
+- **Integrated Functionality**: Combines downloading and analyzing award data in one tool
+- **User-Friendly Interface**: Simplifies the process of fetching and analyzing data
+- **Real-Time Results**: View results and insights immediately after analysis
+- **Highlighting Red Flags**: Automatically highlights keywords in abstracts for easy identification
+
 ## Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/saientropy/nsf-awards-analysis.git
+   git clone https://github.com/your-username/nsf-awards-analysis.git
    cd nsf-awards-analysis
    ```
 
