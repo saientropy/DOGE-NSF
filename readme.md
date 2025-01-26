@@ -1,6 +1,6 @@
 # NSF Research Awards Analysis Suite to detect "word-salad" fraud.
 
-Abstract fraud is often decided based on the observation that some researchers fill their abstracts with **"word salad"**—a jumble of buzzwords and jargon that sounds impressive but ultimately means nothing. This tactic is used to impress reviewers and secure funding for research that is often incremental and has little to no real impact.
+STEM Abstract fraud is often decided based on the observation that some researchers fill their abstracts with **"word salad"**—a jumble of buzzwords and jargon that sounds impressive but ultimately means nothing. This tactic is used to impress reviewers and secure funding for research that is often incremental and has little to no real impact.
 
 The goal of this analysis suite is to uncover how science funding is allocated to projects that may not contribute significantly to the advancement of knowledge or societal benefit. By analyzing award abstracts for specific keywords and patterns, we aim to identify instances where funding may be going to research that lacks substance or genuine innovation.
 
